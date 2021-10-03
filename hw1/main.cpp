@@ -5,6 +5,43 @@
 #include <windows.h>
 using namespace std;
 
+class Vertex {
+	public:
+		float x;
+		float y;
+		float z;
+		void normalize() {
+			float magnitude;
+			magnitude = sqrt(this->x * this->x + this->y * this->y + this->z * this->z);
+			*this = *this / magnitude;
+		}
+		Vertex operator + (Vertex const& obj) {
+			Vertex temp;
+			temp.x = this->x + obj.x;
+			temp.y = this->y + obj.y;
+			temp.z = this->z + obj.z;
+			return temp;
+		}
+		Vertex operator - (Vertex const& obj) {
+			Vertex temp;
+			temp.x = this->x - obj.x;
+			temp.y = this->y - obj.y;
+			temp.z = this->z - obj.z;
+			return temp;
+		}
+		Vertex operator / (float const& num) {
+			Vertex temp;
+			temp.x = this->x / num;
+			temp.y = this->y / num;
+			temp.z = this->z / num;
+			return temp;
+		}
+		friend ostream& operator<<(ostream& os, const Vertex& v) {
+			os << v.x << "," << v.y << "," << v.z;
+			return os;
+		}
+};
+
 int windowSize[2];
 
 void light();
@@ -13,19 +50,17 @@ void keyboard(unsigned char key, int x, int y);
 void idle();
 void reshape(GLsizei, GLsizei);
 void LoadModel(Object*);
-void DrawBasis();
+void DrawBase();
 void DrawSphere1(float radius, float slice, float stack, float r, float g, float b);
 void DrawSphere2(float radius, float slice, float stack, float r, float g, float b);
 void AddDegree(int* degree_var, int degree);
 
 int minute = 0, hour = 0;
-int rotate_degree = 0, sun_degree = 0,pika_degree = 0, moon_degree = 0;
-bool rotate_flag = false, sun_flag = false,pika_flag = false , moon_flag = false;
-Object* elephant = new Object("elephant.obj");
-Object* cube = new Object("cube.obj");
-Object* teapot = new Object("teapot.obj");
+int rotate_degree = 0, pika_degree = 0, moon_degree = 0;
+bool rotate_flag = false, pika_flag = false , moon_flag = false;
 Object* Clock = new Object("clock.obj");
-Object* Pikachu = new Object("Pikachu.obj");
+Object p("Pikachu.obj");
+Object* Pikachu = &p;
 GLUquadricObj* bar = gluNewQuadric();
 
 GLfloat default_diffuse[] = { 0.8f, 0.8f, 0.8f, 1.0f};
@@ -37,7 +72,7 @@ int main(int argc, char** argv)
 	glutInit(&argc, argv);
 	glutInitWindowSize(700, 700);
 	glutInitWindowPosition(0, 0);
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 	glutCreateWindow("HW1");
 	glutDisplayFunc(display);
 	glutReshapeFunc(reshape);
@@ -93,17 +128,18 @@ void display()
 
 	light();
 
-	GLfloat no_mat[] = { 0.0, 0.0, 0.0, 1.0 };
-	GLfloat clock_diffuse[] = { 1, 1, 1, 0.5 };
-	GLfloat bar_diffuse[] = { 1, 0, 1, 0.5 };
+	GLfloat clock_diffuse[] = { 1, 1, 1, 1 };
+	GLfloat l_hand_diffuse[] = { 1, 0, 1, 1 };
+	GLfloat s_hand_diffuse[] = { 0, 1, 1, 1 };
 	GLfloat pikachu_diffuse[] = { 1, 1, 0, 1 };
+	GLfloat base_diffuse[] = { 1, 0, 0, 1 };
 
-	// adjust model to face to front
-	glPushMatrix();
-
-	// rotate all clock 
+	// rotate & translate whole clock & base
 	glPushMatrix();
 	glRotatef(rotate_degree, 0, 1, 0);
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, base_diffuse);
+	DrawBase();
+	glTranslatef(0.0f, 7.5f, 0.0f);
 
 	// render clock model
 	glPushMatrix();
@@ -118,15 +154,16 @@ void display()
 
 	// render minute hand of clock
 	glPushMatrix();
-	glRotatef(minute, 1, 0, 0);
-	glMaterialfv(GL_FRONT, GL_DIFFUSE, bar_diffuse);
+	//glRotatef(minute, 1, 0, 0);
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, l_hand_diffuse);
 	gluCylinder(bar, 0.3, 0.3, 5, 30, 30);
 	glPopMatrix();
 
 	// render hour hand of clock
 	glPushMatrix();
 	glRotatef(-90, 1, 0, 0);
-	glRotatef(hour, 1, 0, 0);
+	//glRotatef(hour, 1, 0, 0);
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, s_hand_diffuse);
 	gluCylinder(bar, 0.3, 0.3, 3, 30, 30);
 	glPopMatrix();
 
@@ -138,28 +175,14 @@ void display()
 	glPushMatrix();
 	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, pikachu_diffuse);
 	glRotatef(moon_degree, 0, 1, 0);
-	glTranslatef(12.0f, 0.0f, 0.0f);
+	glTranslatef(14.0f, 0.0f, 0.0f);
+	glRotatef(45, 0, 1, 0);
 	glRotatef(pika_degree, 0, 1, 0);
-	glScalef(5.0f, 5.0f, 5.0f);
+	glScalef(10.0f, 10.0f, 10.0f);
 	LoadModel(Pikachu);
 	glPopMatrix();
 	// set amibent back to default
 	glMaterialfv(GL_FRONT, GL_AMBIENT, default_ambient);
-
-	//render sun
-	glPushMatrix();
-	glRotatef(sun_degree, 0, 0, 1);
-	glTranslatef(0.0f, 18.0f, 0.0f);
-	DrawSphere2(4, 240, 60, 1, 0, 0);
-	glPopMatrix();
-
-	//glPushMatrix();
-	//glRotatef(moon_degree, 0, 1, 0);
-	//glTranslatef(0.0f, 0.0f, 12.5f);
-	//DrawSphere1(2,240,60,1,1,0);
-	//glPopMatrix();
-
-	glPopMatrix();
 
 	minute++;
 	minute %= 360;
@@ -172,10 +195,6 @@ void display()
 		AddDegree(&rotate_degree, 1);
 	}
 
-	if (sun_flag) {
-		AddDegree(&sun_degree,1);
-	}
-
 	if (pika_flag) {
 		AddDegree(&pika_degree, 1);
 	}
@@ -183,7 +202,6 @@ void display()
 	if (moon_flag) {
 		AddDegree(&moon_degree, 2);
 	}
-	//glutPostRedisplay();
 	glutSwapBuffers();
 }
 
@@ -196,9 +214,6 @@ void reshape(GLsizei w, GLsizei h)
 void keyboard(unsigned char key, int x, int y) {
 	if (key == 'r') {
 		rotate_flag = !rotate_flag;
-	}
-	else if (key == 's') {
-		sun_flag = !sun_flag;
 	}
 	else if (key == 'p') {
 		pika_flag = !pika_flag;
@@ -224,33 +239,98 @@ void LoadModel(Object* Model) {
 		glEnd();
 	}
 }
-void DrawBasis() {
-	float edge = 20;
+void DrawBase() {
+	float edge = 5;
 	float radius = 10;
-	float pi = 3.1415926;
+	float tip_radius = radius * sqrt(3);
+	float adjust_angle = 36 * M_PI / 180.0f;
+	vector<Vertex> centerPolygon;
+	vector<Vertex> starTip;
+	
+	//// calculate the vertex position of star base
+	Vertex temp{0,0,0};
+	// calculate the center Pentagon
+	for (int i = 0; i < edge; i++) {
+		temp.x = radius * sin(i / edge * 2 * M_PI);
+		temp.y = 0;
+		temp.z = radius * cos(i / edge * 2 * M_PI);
+		centerPolygon.push_back(temp);
+	}
+	// calculate the tip position of star
+	for (int i = 0; i < edge; i++) {
+		temp.x = tip_radius * sin(i / edge * 2 * M_PI + adjust_angle);
+		temp.y = 0;
+		temp.z = tip_radius * cos(i / edge * 2 * M_PI + adjust_angle);
+		starTip.push_back(temp);
+	}
 
+	//// render base
+	// draw the star polygon on top
 	glBegin(GL_POLYGON);
 	for (int i = 0; i < edge; i++) {
 		glNormal3d(0, 1, 0);
-		glVertex3d(radius * sin(i / edge * 2 * pi), 0, radius * cos(i / edge * 2 * pi));
+		glVertex3d(centerPolygon[i].x, centerPolygon[i].y, centerPolygon[i].z );
 	}
 	glEnd();
 
 	for (int i = 0; i < edge; i++) {
-		glBegin(GL_POLYGON);
-		glNormal3d(sin(i / edge * 2 * pi), 0, cos(i / edge * 2 * pi));
-		glVertex3d(radius * sin(i / edge * 2 * pi), 0, radius * cos(i / edge * 2 * pi));
-		glVertex3d(radius * sin(i / edge * 2 * pi), -5, radius * cos(i / edge * 2 * pi));
-		glVertex3d(radius * sin((i + 1) / edge * 2 * pi), -5, radius * cos((i + 1) / edge * 2 * pi));
-		glVertex3d(radius * sin((i + 1) / edge * 2 * pi), 0, radius * cos((i + 1) / edge * 2 * pi));
+		glBegin(GL_TRIANGLES);
+		glNormal3d(0, 1, 0);
+		glVertex3d(starTip[i].x,starTip[i].y,starTip[i].z);
+		glNormal3d(0, 1, 0);
+		glVertex3d(centerPolygon[i].x, centerPolygon[i].y, centerPolygon[i].z);
+		int idx = (i + 1) % (int)edge;
+		glNormal3d(0, 1, 0);
+		glVertex3d(centerPolygon[idx].x, centerPolygon[idx].y, centerPolygon[idx].z);
 		glEnd();
 	}
+
+	// draw the side of base
+	for (int i = 0; i < edge; i++) {
+		for (int j = 0; j < 2; j++) {
+			int idx = i;
+			Vertex v1, v2,v3,center,normal;
+			if (j) {
+				idx = (idx + 1) % (int)edge;
+				v3 = centerPolygon[i];
+			}
+			else {
+				v3 = centerPolygon[(idx + 1) % (int)edge];
+			}
+			v1 = centerPolygon[idx];
+			v2 = starTip[i];
+			center = (v2 + v1) / 2;
+			normal = center - v3;
+			normal.normalize();
+			glBegin(GL_POLYGON);
+			glNormal3d(normal.x,normal.y,normal.z);
+			glVertex3d(v1.x, v1.y, v1.z);
+			glVertex3d(v2.x, v2.y, v2.z);
+			glVertex3d(v2.x, -5, v2.z);
+			glVertex3d(v1.x, -5, v1.z);
+			glEnd();
+		}
+	}
+
+	// draw the star polygon on bottom
 	glBegin(GL_POLYGON);
 	for (int i = 0; i < edge; i++) {
 		glNormal3d(0, -1, 0);
-		glVertex3d(radius * sin(i / edge * 2 * pi), -5, radius * cos(i / edge * 2 * pi));
+		glVertex3d(centerPolygon[i].x, -5, centerPolygon[i].z);
 	}
 	glEnd();
+
+	for (int i = 0; i < edge; i++) {
+		glBegin(GL_TRIANGLES);
+		glNormal3d(0, -1, 0);
+		glVertex3d(starTip[i].x, -5, starTip[i].z);
+		glNormal3d(0, -1, 0);
+		glVertex3d(centerPolygon[i].x, -5, centerPolygon[i].z);
+		int idx = (i + 1) % (int)edge;
+		glNormal3d(0, -1, 0);
+		glVertex3d(centerPolygon[idx].x, -5, centerPolygon[idx].z);
+		glEnd();
+	}
 }
 
 void DrawSphere1(float radius, float slice, float stack, float r, float g, float b) {

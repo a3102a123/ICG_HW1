@@ -46,21 +46,27 @@ void display()
 	glDepthFunc(GL_LEQUAL);
 	glClear(GL_DEPTH_BUFFER_BIT);
 
+	// Face Culling
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_FRONT);
+	glFrontFace(GL_CW);
+
 	glBegin(GL_TRIANGLES);
-	//red triangle (z = 0)
+
+	//colorful triangle (z = 0) (vertex order is counterclockwise)
 	glColor3f(1.0f, 0.0f, 0.0f);
 	glVertex3f(1.0f, 0.0f, 0.0f);
-	glColor3f(1.0f, 0.0f, 0.0f);
+	glColor3f(0.0f, 1.0f, 0.0f);
 	glVertex3f(0.0f, 1.0f, 0.0f);
-	glColor3f(1.0f, 0.0f, 0.0f);
+	glColor3f(0.0f, 0.0f, 1.0f);
 	glVertex3f(0.0f, 0.0f, 0.0f);
-	//blue triangle (z = -1)
+	//blue triangle (z = -1) (vertex order is clockwise)
 	glColor3f(0.0f, 0.0f, 1.0f);
 	glVertex3f(1.0f, 0.0f, -1.0f);
 	glColor3f(0.0f, 0.0f, 1.0f);
-	glVertex3f(0.0f, 1.0f, -1.0f);
-	glColor3f(0.0f, 0.0f, 1.0f);
 	glVertex3f(0.0f, 0.0f, -1.0f);
+	glColor3f(0.0f, 0.0f, 1.0f);
+	glVertex3f(0.0f, 1.0f, -1.0f);
 
 	glEnd();
 
