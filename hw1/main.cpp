@@ -1,4 +1,6 @@
 #define _USE_MATH_DEFINES
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 #include "Object.h"
 #include "glut.h"
 #include <math.h>
@@ -43,13 +45,17 @@ class Vertex {
 };
 
 int windowSize[2];
+unsigned int texture;
+int width, height, nrChannels;
+unsigned char* pikachuTexture;
 
 void light();
 void display();
 void keyboard(unsigned char key, int x, int y);
 void idle();
 void reshape(GLsizei, GLsizei);
-void LoadModel(Object*);
+void InitTexture();
+void LoadModel(Object*, bool is_Pikachu);
 void DrawBase();
 void DrawSphere1(float radius, float slice, float stack, float r, float g, float b);
 void DrawSphere2(float radius, float slice, float stack, float r, float g, float b);
@@ -78,6 +84,7 @@ int main(int argc, char** argv)
 	glutReshapeFunc(reshape);
 	glutKeyboardFunc(keyboard);
 	glutIdleFunc(idle);
+	InitTexture();
 	glutMainLoop();
 	return 0;
 }
@@ -131,7 +138,6 @@ void display()
 	GLfloat clock_diffuse[] = { 1, 1, 1, 1 };
 	GLfloat l_hand_diffuse[] = { 1, 0, 1, 1 };
 	GLfloat s_hand_diffuse[] = { 0, 1, 1, 1 };
-	GLfloat pikachu_diffuse[] = { 1, 1, 0, 1 };
 	GLfloat base_diffuse[] = { 1, 0, 0, 1 };
 
 	// rotate & translate whole clock & base
@@ -145,7 +151,7 @@ void display()
 	glPushMatrix();
 	glScalef(0.08f, 0.08f, 0.08f);
 	glMaterialfv(GL_FRONT, GL_DIFFUSE, clock_diffuse);
-	LoadModel(Clock);
+	LoadModel(Clock,false);
 	glPopMatrix();
 
 	// adjust hand to x-y surface
@@ -173,16 +179,13 @@ void display()
 
 	// render pikachu
 	glPushMatrix();
-	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, pikachu_diffuse);
 	glRotatef(moon_degree, 0, 1, 0);
 	glTranslatef(14.0f, 0.0f, 0.0f);
 	glRotatef(45, 0, 1, 0);
 	glRotatef(pika_degree, 0, 1, 0);
 	glScalef(10.0f, 10.0f, 10.0f);
-	LoadModel(Pikachu);
+	LoadModel(Pikachu,true);
 	glPopMatrix();
-	// set amibent back to default
-	glMaterialfv(GL_FRONT, GL_AMBIENT, default_ambient);
 
 	minute++;
 	minute %= 360;
@@ -227,16 +230,45 @@ void idle() {
 	glutPostRedisplay();
 }
 
-void LoadModel(Object* Model) {
+void InitTexture() {
+	stbi_set_flip_vertically_on_load(true);
+	pikachuTexture = stbi_load("Pikachu.png", &width, &height, &nrChannels, 0);
+	glEnable(GL_TEXTURE_2D);
+
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, pikachuTexture);
+	glDisable(GL_TEXTURE_2D);
+}
+
+void LoadModel(Object* Model,bool is_Pikachu) {
+	if (is_Pikachu) {
+		GLfloat pikachu_diffuse[] = { 1, 1, 0, 1 };
+		glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, pikachu_diffuse);
+		glEnable(GL_TEXTURE_2D);
+	}
 	for (size_t i = 0; i < Model->fNum; ++i)
 	{
 		glBegin(GL_TRIANGLES);
 		for (size_t j = 0; j < 3; ++j)
 		{
+			if (is_Pikachu) {
+				int idx = i * 3 * 2 + j * 2;
+				glTexCoord2f(Model->texcoords[idx],Model->texcoords[idx+1]);
+			}
 			glNormal3fv(Model->nList[Model->faceList[i][j].nIndex].ptr);
 			glVertex3fv(Model->vList[Model->faceList[i][j].vIndex].ptr);
 		}
 		glEnd();
+	}
+	if (is_Pikachu) {
+		glDisable(GL_TEXTURE_2D);
+		// set amibent back to default
+		glMaterialfv(GL_FRONT, GL_AMBIENT, default_ambient);
 	}
 }
 void DrawBase() {

@@ -70,6 +70,8 @@ void Object::LoadObj(string obj_file)
 					if (prefix[i] == '/') {
 						if (Istexture) {
 							tmpVertex[j].tIndex = atoi(tmp.c_str());
+							texcoords.push_back(tList[atoi(tmp.c_str())].ptr[0]);
+							texcoords.push_back(tList[atoi(tmp.c_str())].ptr[1]);
 						}
 						else tmpVertex[j].vIndex = atoi(tmp.c_str());
 						tmp = "";

@@ -54,6 +54,7 @@ public:
 	vector<Vec3>			vList,tList,nList;		// vertex,texture,normal coordinate List
 	vector<FACE>			faceList;	// face List
 	size_t fNum=0; //Number of material,face
+	vector<float> texcoords;
 
 	void LoadObj(std::string obj_file);
 	Object(const char* obj_file);
