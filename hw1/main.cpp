@@ -272,10 +272,12 @@ void LoadModel(Object* Model,bool is_Pikachu) {
 	}
 }
 void DrawBase() {
-	float edge = 5;
+	float edge = 6;
 	float radius = 10;
-	float tip_radius = radius * sqrt(3);
-	float adjust_angle = 36 * M_PI / 180.0f;
+	float tip_radius = radius * sqrt(3) / 2 *2;
+	float adjust_angle = 30 * M_PI / 180.0f;
+	// rotate the initial direction of star's tip (no mathematical matter with the drawing polygon
+	float rotate_angle = 30 * M_PI / 180.0f;
 	vector<Vertex> centerPolygon;
 	vector<Vertex> starTip;
 	
@@ -283,16 +285,16 @@ void DrawBase() {
 	Vertex temp{0,0,0};
 	// calculate the center Pentagon
 	for (int i = 0; i < edge; i++) {
-		temp.x = radius * sin(i / edge * 2 * M_PI);
+		temp.x = radius * sin(i / edge * 2 * M_PI + rotate_angle);
 		temp.y = 0;
-		temp.z = radius * cos(i / edge * 2 * M_PI);
+		temp.z = radius * cos(i / edge * 2 * M_PI + rotate_angle);
 		centerPolygon.push_back(temp);
 	}
 	// calculate the tip position of star
 	for (int i = 0; i < edge; i++) {
-		temp.x = tip_radius * sin(i / edge * 2 * M_PI + adjust_angle);
+		temp.x = tip_radius * sin(i / edge * 2 * M_PI + adjust_angle + rotate_angle);
 		temp.y = 0;
-		temp.z = tip_radius * cos(i / edge * 2 * M_PI + adjust_angle);
+		temp.z = tip_radius * cos(i / edge * 2 * M_PI + adjust_angle + rotate_angle);
 		starTip.push_back(temp);
 	}
 
@@ -304,7 +306,6 @@ void DrawBase() {
 		glVertex3d(centerPolygon[i].x, centerPolygon[i].y, centerPolygon[i].z );
 	}
 	glEnd();
-
 	for (int i = 0; i < edge; i++) {
 		glBegin(GL_TRIANGLES);
 		glNormal3d(0, 1, 0);
