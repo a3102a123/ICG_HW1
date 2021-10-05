@@ -48,6 +48,7 @@ int windowSize[2];
 unsigned int texture;
 int width, height, nrChannels;
 unsigned char* pikachuTexture;
+unsigned char* metalTexture;
 
 void light();
 void display();
@@ -240,8 +241,8 @@ void InitTexture() {
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, pikachuTexture);
+
 	glDisable(GL_TEXTURE_2D);
 }
 
@@ -266,9 +267,9 @@ void LoadModel(Object* Model,bool is_Pikachu) {
 		glEnd();
 	}
 	if (is_Pikachu) {
-		glDisable(GL_TEXTURE_2D);
 		// set amibent back to default
 		glMaterialfv(GL_FRONT, GL_AMBIENT, default_ambient);
+		glDisable(GL_TEXTURE_2D);
 	}
 }
 void DrawBase() {
@@ -300,12 +301,18 @@ void DrawBase() {
 
 	//// render base
 	// draw the star polygon on top
+	// #f72585
+	GLfloat red_diffuse[] = { 247.0f / 255.0f , 37.0f / 255.0f , 133.0f / 255.0f };
+	// #4cc9f0
+	GLfloat blue_diffuse[] = { 114.0f / 255.0f , 201.0f / 255.0f , 240.0f / 255.0f };
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, blue_diffuse);
 	glBegin(GL_POLYGON);
 	for (int i = 0; i < edge; i++) {
 		glNormal3d(0, 1, 0);
 		glVertex3d(centerPolygon[i].x, centerPolygon[i].y, centerPolygon[i].z );
 	}
 	glEnd();
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, red_diffuse);
 	for (int i = 0; i < edge; i++) {
 		glBegin(GL_TRIANGLES);
 		glNormal3d(0, 1, 0);
