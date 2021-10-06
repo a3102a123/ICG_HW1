@@ -56,7 +56,7 @@ void keyboard(unsigned char key, int x, int y);
 void idle();
 void reshape(GLsizei, GLsizei);
 void InitTexture();
-void LoadModel(Object*, bool is_Pikachu);
+void LoadModel(Object*, bool is_Pikachu = false);
 void DrawBase();
 void DrawSphere1(float radius, float slice, float stack, float r, float g, float b);
 void DrawSphere2(float radius, float slice, float stack, float r, float g, float b);
@@ -139,18 +139,17 @@ void display()
 	GLfloat clock_diffuse[] = { 1, 1, 1, 1 };
 	GLfloat l_hand_diffuse[] = { 1, 0, 1, 1 };
 	GLfloat s_hand_diffuse[] = { 0, 1, 1, 1 };
-	GLfloat base_diffuse[] = { 1, 0, 0, 1 };
 
 	// rotate & translate whole clock & base
 	glPushMatrix();
 	glRotatef(rotate_degree, 0, 1, 0);
-	glMaterialfv(GL_FRONT, GL_DIFFUSE, base_diffuse);
 	DrawBase();
 	glTranslatef(0.0f, 7.5f, 0.0f);
 
 	// render clock model
 	glPushMatrix();
 	glScalef(0.08f, 0.08f, 0.08f);
+	// the polygon is too small , no obvious effect
 	glMaterialfv(GL_FRONT, GL_DIFFUSE, clock_diffuse);
 	LoadModel(Clock,false);
 	glPopMatrix();
@@ -161,7 +160,7 @@ void display()
 
 	// render minute hand of clock
 	glPushMatrix();
-	//glRotatef(minute, 1, 0, 0);
+	glRotatef(minute, 1, 0, 0);
 	glMaterialfv(GL_FRONT, GL_DIFFUSE, l_hand_diffuse);
 	gluCylinder(bar, 0.3, 0.3, 5, 30, 30);
 	glPopMatrix();
@@ -169,7 +168,7 @@ void display()
 	// render hour hand of clock
 	glPushMatrix();
 	glRotatef(-90, 1, 0, 0);
-	//glRotatef(hour, 1, 0, 0);
+	glRotatef(hour, 1, 0, 0);
 	glMaterialfv(GL_FRONT, GL_DIFFUSE, s_hand_diffuse);
 	gluCylinder(bar, 0.3, 0.3, 3, 30, 30);
 	glPopMatrix();
@@ -284,7 +283,7 @@ void DrawBase() {
 	
 	//// calculate the vertex position of star base
 	Vertex temp{0,0,0};
-	// calculate the center Pentagon
+	// calculate the center hexagon
 	for (int i = 0; i < edge; i++) {
 		temp.x = radius * sin(i / edge * 2 * M_PI + rotate_angle);
 		temp.y = 0;
@@ -302,9 +301,9 @@ void DrawBase() {
 	//// render base
 	// draw the star polygon on top
 	// #f72585
-	GLfloat red_diffuse[] = { 247.0f / 255.0f , 37.0f / 255.0f , 133.0f / 255.0f };
+	GLfloat red_diffuse[] = { 247.0f / 255.0f , 37.0f / 255.0f , 133.0f / 255.0f , 1.0f};
 	// #4cc9f0
-	GLfloat blue_diffuse[] = { 114.0f / 255.0f , 201.0f / 255.0f , 240.0f / 255.0f };
+	GLfloat blue_diffuse[] = { 114.0f / 255.0f , 201.0f / 255.0f , 240.0f / 255.0f , 1.0f};
 	glMaterialfv(GL_FRONT, GL_DIFFUSE, blue_diffuse);
 	glBegin(GL_POLYGON);
 	for (int i = 0; i < edge; i++) {
