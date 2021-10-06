@@ -55,7 +55,7 @@ void display();
 void idle();
 void reshape(GLsizei, GLsizei);
 void InitTexture();
-void LoadModel(Object*, bool is_Pikachu);
+void LoadModel(Object*, bool is_Pikachu = false);
 void keyboard(unsigned char key, int x, int y);
 void DrawBase();
 
@@ -197,11 +197,11 @@ void DrawBase() {
 	//
 
 	// Draw the triangle with color #f72585
-	GLfloat red_diffuse[] = { 247.0f / 255.0f , 37.0f / 255.0f , 133.0f / 255.0f };
+	GLfloat red_diffuse[] = { 247.0f / 255.0f , 37.0f / 255.0f , 133.0f / 255.0f , 1.0f };
 	glMaterialfv(GL_FRONT, GL_DIFFUSE, red_diffuse);
 
 	// Draw the hexagon with color #4cc9f0
-	GLfloat blue_diffuse[] = { 114.0f / 255.0f , 201.0f / 255.0f , 240.0f / 255.0f };
+	GLfloat blue_diffuse[] = { 114.0f / 255.0f , 201.0f / 255.0f , 240.0f / 255.0f , 1.0f };
 	glMaterialfv(GL_FRONT, GL_DIFFUSE, blue_diffuse);
 
 	//// TO DO : draw the rectangle edge
