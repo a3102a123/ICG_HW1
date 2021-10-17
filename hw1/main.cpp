@@ -128,6 +128,7 @@ void display()
 
 	////TO DO : add model, translate, rotate, scale ,material
 	//
+	DrawBase();
 
 	glutSwapBuffers();
 }
@@ -185,7 +186,7 @@ void LoadModel(Object* Model,bool is_Pikachu) {
 }
 
 void keyboard(unsigned char key, int x, int y) {
-	//// TO DO : implement  the keyboard function
+	//// TO DO : implement the keyboard function
 	//
 }
 
