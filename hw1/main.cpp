@@ -189,7 +189,7 @@ void display()
 
 	minute++;
 	minute %= 360;
-	if (! (minute % 30)) {
+	if (! (minute % 12)) {
 		hour++;
 		hour %= 360;
 	}
