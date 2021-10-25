@@ -146,34 +146,34 @@ void display()
 	DrawBase();
 	glTranslatef(0.0f, 7.5f, 0.0f);
 
-	// render clock model
-	glPushMatrix();
-	glScalef(0.08f, 0.08f, 0.08f);
-	// the polygon is too small , no obvious effect
-	glMaterialfv(GL_FRONT, GL_DIFFUSE, clock_diffuse);
-	LoadModel(Clock,false);
-	glPopMatrix();
+		// render clock model
+		glPushMatrix();
+		glScalef(0.08f, 0.08f, 0.08f);
+		// the polygon is too small , no obvious effect
+		glMaterialfv(GL_FRONT, GL_DIFFUSE, clock_diffuse);
+		LoadModel(Clock,false);
+		glPopMatrix();
 
-	// adjust hand to x-y surface
-	glPushMatrix();
-	glRotatef(90, 0, 1, 0);
+		// adjust hand to x-y surface
+		glPushMatrix();
+		glRotatef(90, 0, 1, 0);
 
-	// render minute hand of clock
-	glPushMatrix();
-	glRotatef(minute, 1, 0, 0);
-	glMaterialfv(GL_FRONT, GL_DIFFUSE, l_hand_diffuse);
-	gluCylinder(bar, 0.3, 0.3, 5, 30, 30);
-	glPopMatrix();
+			// render minute hand of clock
+			glPushMatrix();
+			glRotatef(minute, 1, 0, 0);
+			glMaterialfv(GL_FRONT, GL_DIFFUSE, l_hand_diffuse);
+			gluCylinder(bar, 0.3, 0.3, 5, 30, 30);
+			glPopMatrix();
 
-	// render hour hand of clock
-	glPushMatrix();
-	glRotatef(-90, 1, 0, 0);
-	glRotatef(hour, 1, 0, 0);
-	glMaterialfv(GL_FRONT, GL_DIFFUSE, s_hand_diffuse);
-	gluCylinder(bar, 0.3, 0.3, 3, 30, 30);
-	glPopMatrix();
+			// render hour hand of clock
+			glPushMatrix();
+			glRotatef(-90, 1, 0, 0);
+			glRotatef(hour, 1, 0, 0);
+			glMaterialfv(GL_FRONT, GL_DIFFUSE, s_hand_diffuse);
+			gluCylinder(bar, 0.3, 0.3, 3, 30, 30);
+			glPopMatrix();
 
-	glPopMatrix();
+		glPopMatrix();
 
 	glPopMatrix();
 
