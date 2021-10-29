@@ -58,8 +58,6 @@ void reshape(GLsizei, GLsizei);
 void InitTexture();
 void LoadModel(Object*, bool is_Pikachu = false);
 void DrawBase();
-void DrawSphere1(float radius, float slice, float stack, float r, float g, float b);
-void DrawSphere2(float radius, float slice, float stack, float r, float g, float b);
 void AddDegree(int* degree_var, int degree);
 
 int minute = 0, hour = 0;
@@ -372,52 +370,6 @@ void DrawBase() {
 	}
 }
 
-void DrawSphere1(float radius, float slice, float stack, float r, float g, float b) {
-	GLfloat mat_diffuse[] = { r, g, b, 0.5 };
-	glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
-	float theta, phi, xy_step = 360 / slice, z_step = 180 / stack;
-	float x, y, z;
-	for (phi = -90; phi <= 90; phi += z_step) {
-		glBegin(GL_TRIANGLE_STRIP);
-		for (theta = 0; theta <= 360; theta += xy_step) {
-			x = radius * sin(theta * M_PI / 180) * cos(phi * M_PI / 180);
-			y = radius * cos(theta * M_PI / 180) * cos(phi * M_PI / 180);
-			z = radius * sin(phi * M_PI / 180);
-			glNormal3f(x / radius, y / radius, z / radius);
-			glVertex3d(x, y, z);
-			x = radius * sin(theta * M_PI / 180) * cos((phi + z_step) * M_PI / 180);
-			y = radius * cos(theta * M_PI / 180) * cos((phi + z_step) * M_PI / 180);
-			z = radius * sin((phi + z_step) * M_PI / 180);
-			glNormal3f(x / radius, y / radius, z / radius);
-			glVertex3d(x, y, z);
-		}
-		glEnd();
-	}
-}
-void DrawSphere2(float radius, float slice, float stack, float r, float g, float b) {
-	GLfloat mat_diffuse[] = { r, g, b, 0.5 };
-	glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
-	float x, y, z;
-	for (int j = 0; j <= stack; j++) {
-		glBegin(GL_TRIANGLE_STRIP);
-		for (int i = 0; i <= slice; i++) {
-			float dx = i / slice;
-			float dy = j / stack;
-			x = radius * cos(2 * M_PI * dx) * sin(dy * M_PI);
-			y = radius * sin(2 * M_PI * dx) * sin(dy * M_PI);
-			z = radius * cos(dy * M_PI);
-			glNormal3f(x / radius, y / radius, z / radius);
-			glVertex3d(x, y, z);
-			dy = (j + 1) / stack;
-			x = radius * cos(2 * M_PI * dx) * sin(dy * M_PI);
-			y = radius * sin(2 * M_PI * dx) * sin(dy * M_PI);
-			z = radius * cos(dy * M_PI);
-			glNormal3f(x / radius, y / radius, z / radius);
-			glVertex3d(x, y, z);
-		}
-		glEnd();
-	}
-}
 void AddDegree(int* degree_var, int degree) {
 	*degree_var += degree;
 	*degree_var %= 360;
