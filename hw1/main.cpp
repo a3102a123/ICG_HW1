@@ -17,6 +17,13 @@ class Vertex {
 			magnitude = sqrt(this->x * this->x + this->y * this->y + this->z * this->z);
 			*this = *this / magnitude;
 		}
+		Vertex cross(Vertex v2) {
+			Vertex temp;
+			temp.x = this->y * v2.z - this->z * v2.y;
+			temp.y = this->z * v2.x - this->x * v2.z;
+			temp.z = this->x * v2.y - this->y * v2.x;
+			return temp;
+		}
 		Vertex operator + (Vertex const& obj) {
 			Vertex temp;
 			temp.x = this->x + obj.x;
@@ -71,6 +78,10 @@ GLUquadricObj* bar = gluNewQuadric();
 GLfloat default_diffuse[] = { 0.8f, 0.8f, 0.8f, 1.0f};
 GLfloat default_ambient[] = { 0.2f, 0.2f, 0.2f, 1.0f};
 
+// set false let program calculate the normal vector of base by cross
+// I using the geometric relationship to calculate the normal that is why 
+// there is no cross function provided in class Vertex of HW1 main.cpp
+bool Geometry_way = true;
 
 int main(int argc, char** argv)
 {
@@ -336,9 +347,26 @@ void DrawBase() {
 			}
 			v1 = centerPolygon[idx];
 			v2 = starTip[i];
-			center = (v2 + v1) / 2;
-			normal = center - v3;
-			normal.normalize();
+			if (Geometry_way) {
+				// using Geometry
+				center = (v2 + v1) / 2;
+				normal = center - v3;
+				normal.normalize();
+			}
+			else {
+				// using cross
+				v3 = { 0,-1,0 };
+				// the vector point from v2 to v1
+				Vertex v21 = v1 - v2;
+				if (j) {
+					normal = v3.cross(v21);
+					normal.normalize();
+				}
+				else {
+					normal = v21.cross(v3);
+					normal.normalize();
+				}
+			}
 			glBegin(GL_POLYGON);
 			glNormal3d(normal.x,normal.y,normal.z);
 			glVertex3d(v1.x, v1.y, v1.z);
